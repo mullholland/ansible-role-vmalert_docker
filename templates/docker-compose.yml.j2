@@ -1,0 +1,39 @@
+---
+networks:
+  {{ app_network }}:
+    external: true
+
+services:
+  vmalert:
+    image: "{{ app_image }}"
+    hostname: "{{ app_name }}"
+{% if app_commands and app_commands|length %}
+    command:
+{% for app_command in app_commands %}
+      - {{ app_command }}
+{% endfor %}{% endif %}
+    restart: always
+    user: "{{ app_uid }}:{{ app_gid }}"
+    volumes:
+{% for app_volume in app_volumes %}
+      - {{ app_volume }}
+{% endfor %}
+    environment:
+      PUID: {{ app_uid }}
+      PGID: {{ app_gid }}
+      TZ: {{ app_timezone }}
+{% for app_environment in app_environment_variables %}
+      {{ app_environment }}
+{% endfor %}
+    networks:
+      - {{ app_network }}
+{% if app_ports and app_ports|length %}
+    ports:
+{% for app_port in app_ports %}
+      - {{ app_port }}
+{% endfor %}{% endif %}
+{% if app_labels and app_labels|length %}
+    labels:
+{% for app_label in app_labels %}
+      - "{{ app_label}}"
+{% endfor %}{% endif %}

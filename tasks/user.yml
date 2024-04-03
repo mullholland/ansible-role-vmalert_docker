@@ -1,0 +1,13 @@
+---
+- name: user | Ensure group exists
+  ansible.builtin.group:
+    name: "{{ vmalert_docker_group }}"
+    gid: "{{ vmalert_docker_gid }}"
+    state: present
+
+- name: user | Ensure user exists with gid
+  ansible.builtin.user:
+    name: "{{ vmalert_docker_user }}"
+    uid: "{{ vmalert_docker_uid }}"
+    system: "{{ vmalert_docker_user_system | default(omit) }}"
+    state: "present"

@@ -1,0 +1,22 @@
+# {{ ansible_managed }}
+groups:
+{% if vmalert_docker_alerts_vmsingle and vmalert_docker_alerts_vmsingle|length %}
+# Alerts for VictoriaMetrics single server
+{{ vmalert_docker_alerts_vmsingle | to_nice_yaml(indent=2, width=1200) }}
+{% endif %}
+{% if vmalert_docker_alerts_vmagent and vmalert_docker_alerts_vmagent|length %}
+# Alerts for vmagent service
+{{ vmalert_docker_alerts_vmagent | to_nice_yaml(indent=2, width=1200) }}
+{% endif %}
+{% if vmalert_docker_alerts_vmalert and vmalert_docker_alerts_vmalert|length %}
+# Alerts for vmalert service
+{{ vmalert_docker_alerts_vmalert | to_nice_yaml(indent=2, width=1200) }}
+{% endif %}
+{% if vmalert_docker_alerts_vmhealth and vmalert_docker_alerts_vmhealth|length %}
+# Alerts for various VM components
+{{ vmalert_docker_alerts_vmhealth | to_nice_yaml(indent=2, width=1200) }}
+{% endif %}
+{% if vmalert_docker_alerts_custom and vmalert_docker_alerts_custom|length %}
+# Alerts for your custom services/components
+{{ vmalert_docker_alerts_custom | to_nice_yaml(indent=2, width=1200) }}
+{% endif %}

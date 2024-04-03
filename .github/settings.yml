@@ -1,0 +1,8 @@
+---
+#
+# Ansible managed
+#
+repository:
+  description: Installs and configures vmalert container based on official vmalert docker container
+  homepage: https://mullholland.net
+  topics: cloud, development, webserver, vmalert, proxy, ansible, molecule, tox, playbook

@@ -1,0 +1,10 @@
+---
+- name: vmalert_systemd_reload
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: vmalert_restart
+  ansible.builtin.service:
+    name: "vmalert"
+    state: restarted
+    enabled: true

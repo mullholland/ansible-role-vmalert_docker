@@ -1,0 +1,62 @@
+---
+- name: vmalert | set application facts
+  ansible.builtin.set_fact:
+    app_name: "vmalert"
+    app_image: "{{ vmalert_docker_version }}"
+    app_network: "{{ vmalert_docker_network_name }}"
+    app_base_path: "{{ vmalert_docker_base_path }}"
+    app_user: "{{ vmalert_docker_user }}"
+    app_uid: "{{ vmalert_docker_uid }}"
+    app_group: "{{ vmalert_docker_group }}"
+    app_gid: "{{ vmalert_docker_gid }}"
+    app_timezone: "{{ vmalert_docker_timezone }}"
+    app_environment_variables: "{{ vmalert_docker_environment_variables }}"
+    app_commands: "{{ vmalert_docker_commands }}"
+    app_volumes: "{{ vmalert_docker_volumes }}"
+    app_labels: "{{ vmalert_docker_labels }}"
+    app_ports: "{{ vmalert_docker_ports }}"
+
+- name: "vmalert | Ensure app folders exists"
+  ansible.builtin.file:
+    name: '{{ app_base_path }}/{{ app_name }}/{{ item }}'
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: "0770"
+    state: directory
+  with_items:
+    - "alerts"
+
+- name: vmalert | get docker executable path
+  ansible.builtin.command:
+    cmd: "which docker"
+  changed_when: false
+  register: vmalert_docker_executable_path
+
+- name: "vmalert | create docker-compose.yml"
+  ansible.builtin.template:
+    src: "docker-compose.yml.j2"
+    dest: "{{ app_base_path }}/{{ app_name }}/docker-compose.yml"
+    mode: "0640"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+  notify: vmalert_restart
+
+- name: "vmalert | create alerts.yml"
+  ansible.builtin.template:
+    src: "alerts.yml.j2"
+    dest: "{{ app_base_path }}/{{ app_name }}/alerts/alerts.yml"
+    mode: "0640"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+  notify: vmalert_restart
+
+- name: "vmalert | Create systemd service"
+  ansible.builtin.template:
+    src: "systemd.service.j2"
+    dest: "/etc/systemd/system/{{ app_name }}.service"
+    mode: "0770"
+    owner: "root"
+    group: "root"
+  notify:
+    - vmalert_systemd_reload
+    - vmalert_restart
